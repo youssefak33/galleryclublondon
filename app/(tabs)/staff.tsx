@@ -1,48 +1,55 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import Screen from '@/components/Screen';
 import Card from '@/components/Card';
 import AppButton from '@/components/AppButton';
-import { MOCK_USERS, User } from '@/api/mockData';
 import { COLORS, FONTS, SIZES } from '@/constants/theme';
 import { useAuthStore } from '@/store/authStore';
-import { Redirect } from 'expo-router';
 
-export default function StaffScreen() {
-  const { user } = useAuthStore();
+export default function StaffProfileScreen() {
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
 
-  // This is a security measure. Even if the tab is visible,
-  // this will prevent non-staff from seeing the content.
-  if (user?.role !== 'staff') {
-    return <Redirect href="/(tabs)/profile" />;
+  const handleLogout = () => {
+    logout();
+    router.replace('/login');
+  };
+
+  if (!user || user.role !== 'staff') {
+    return (
+      <Screen style={styles.centered}>
+        <Text style={styles.restrictedText}>Staff access only.</Text>
+      </Screen>
+    );
   }
-
-  const members = MOCK_USERS.filter(u => u.role === 'user');
-
-  const renderMember = ({ item }: { item: User }) => (
-    <Card style={styles.memberCard}>
-      <Text style={styles.memberName}>{item.name}</Text>
-      <Text style={styles.memberInfo}>Email: {item.email}</Text>
-      <Text style={styles.memberInfo}>Membership: {item.membership}</Text>
-      <Text style={styles.memberInfo}>Points: {item.points}</Text>
-    </Card>
-  );
 
   return (
     <Screen>
-      <Text style={styles.title}>Staff Dashboard</Text>
-      
-      <View style={styles.actions}>
-        <AppButton title="Scan QR Code" onPress={() => alert("Scanner not implemented")} />
-      </View>
-
-      <Text style={styles.subtitle}>Club Members</Text>
-      <FlatList
-        data={members}
-        renderItem={renderMember}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-      />
+      <Text style={styles.title}>Staff Profile</Text>
+      <Card style={styles.card}>
+        <View style={styles.row}>
+          <Text style={styles.label}>Name</Text>
+          <Text style={styles.value}>{user.name}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.value}>{user.email}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Role</Text>
+          <Text style={styles.value}>Staff</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Membership</Text>
+          <Text style={styles.value}>{user.membership}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Points</Text>
+          <Text style={styles.value}>{user.points}</Text>
+        </View>
+      </Card>
+      <AppButton title="Log out" onPress={handleLogout} variant="secondary" />
     </Screen>
   );
 }
@@ -54,26 +61,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: SIZES.padding,
   },
-  subtitle: {
-    ...FONTS.h2,
-    color: COLORS.textSecondary,
-    fontWeight: 'bold',
-    marginTop: SIZES.padding,
-    marginBottom: SIZES.base,
-  },
-  actions: {
+  card: {
+    padding: SIZES.padding,
     marginBottom: SIZES.padding,
   },
-  memberCard: {
-    padding: SIZES.base * 1.5,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SIZES.base,
   },
-  memberName: {
-    ...FONTS.h4,
-    color: COLORS.accent,
-    fontWeight: 'bold',
+  label: {
+    ...FONTS.body4,
+    color: COLORS.textSecondary,
   },
-  memberInfo: {
+  value: {
     ...FONTS.body4,
     color: COLORS.textPrimary,
+    fontWeight: '600',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  restrictedText: {
+    ...FONTS.body3,
+    color: COLORS.textSecondary,
   },
 });
+

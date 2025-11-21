@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: 'bold',
     marginBottom: SIZES.padding,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   },
   perkCard: {
     marginBottom: SIZES.padding,
@@ -73,16 +75,20 @@ const styles = StyleSheet.create({
   },
   partnerName: {
     ...FONTS.h3,
-    color: COLORS.accent,
+    color: COLORS.textPrimary,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   lockIcon: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surfaceHighlight,
+    backgroundColor: COLORS.glass,
     paddingHorizontal: SIZES.base,
     paddingVertical: SIZES.base / 2,
     borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   requiredText: {
     ...FONTS.body4,

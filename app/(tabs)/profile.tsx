@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, Share, Modal } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import Screen from '@/components/Screen';
@@ -73,7 +74,7 @@ export default function ProfileScreen() {
   }
 
   const getMembershipColor = (membership: string) => {
-    if (membership === 'Gold') return COLORS.accent; // #FFD700
+    if (membership === 'Gold') return COLORS.goldGradient[0];
     if (membership === 'Silver') return '#C0C0C0';
     return '#CD7F32'; // Bronze
   };
@@ -86,103 +87,193 @@ export default function ProfileScreen() {
 
   return (
     <Screen scrollable>
-      <View style={styles.header}>
-        <Image source={{ uri: profile.avatar }} style={styles.avatar} />
-        <Text style={styles.name}>{profile.name}</Text>
-        <Text style={styles.email}>{profile.email}</Text>
-        <AppButton title="Logout" onPress={handleLogout} variant="secondary" />
-      </View>
+      {/* Header Premium avec gradient */}
+      <LinearGradient
+        colors={[COLORS.surface, COLORS.primaryBackground]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <View style={styles.avatarContainer}>
+            <Image source={{ uri: profile.avatar }} style={styles.avatar} />
+            <View style={[styles.avatarBadge, { backgroundColor: getMembershipColor(profile.membership) }]}>
+              <Ionicons name="checkmark" size={16} color={COLORS.primaryBackground} />
+            </View>
+          </View>
+          <Text style={styles.name}>{profile.name}</Text>
+          <Text style={styles.email}>{profile.email}</Text>
+          <View style={styles.pointsContainer}>
+            <Ionicons name="star" size={20} color={COLORS.textSecondary} />
+            <Text style={styles.pointsText}>{profile.points} Points</Text>
+          </View>
+        </View>
+      </LinearGradient>
 
-      <Card style={[styles.membershipCard, { 
-        backgroundColor: getMembershipBackgroundColor(profile.membership),
+      <Card variant="premium" style={[styles.membershipCard, { 
         borderColor: getMembershipColor(profile.membership),
         borderWidth: 2,
       }]}>
-        <View style={styles.membershipHeader}>
-          <Text style={[styles.membershipTitle, { color: getMembershipColor(profile.membership) }]}>
-            Membership Status
+        <LinearGradient
+          colors={[getMembershipBackgroundColor(profile.membership), getMembershipBackgroundColor(profile.membership) + '00']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.membershipGradient}
+        >
+          <View style={styles.membershipHeader}>
+            <View style={styles.membershipTitleContainer}>
+              <Ionicons name="shield-checkmark" size={28} color={getMembershipColor(profile.membership)} />
+              <Text style={[styles.membershipTitle, { color: getMembershipColor(profile.membership) }]}>
+                Membership Status
+              </Text>
+            </View>
+          </View>
+          <Text style={[styles.membership, { color: getMembershipColor(profile.membership) }]}>
+            {profile.membership}
           </Text>
-          <Ionicons name="shield-checkmark" size={24} color={getMembershipColor(profile.membership)} />
-        </View>
-        <Text style={[styles.membership, { color: getMembershipColor(profile.membership) }]}>
-          {profile.membership}
-        </Text>
+          <View style={styles.membershipBadge}>
+            <Ionicons name="diamond" size={16} color={getMembershipColor(profile.membership)} />
+            <Text style={[styles.membershipBadgeText, { color: getMembershipColor(profile.membership) }]}>
+              Premium Member
+            </Text>
+          </View>
+        </LinearGradient>
       </Card>
 
-      <Card>
-        <Text style={styles.cardTitle}>My Stats</Text>
-        <View style={styles.statsRow}>
-          <Text style={styles.statsLabel}>Gender</Text>
-          <Text style={styles.statsValue}>{profile.gender}</Text>
+      <Card variant="premium">
+        <View style={styles.cardHeader}>
+          <Ionicons name="stats-chart" size={24} color={COLORS.textSecondary} />
+          <Text style={styles.cardTitle}>My Stats</Text>
         </View>
-        <View style={styles.statsRow}>
-          <Text style={styles.statsLabel}>Points</Text>
-          <Text style={styles.statsValue}>{profile.points}</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Ionicons name="person" size={20} color={COLORS.textTertiary} />
+            <View style={styles.statContent}>
+              <Text style={styles.statsLabel}>Gender</Text>
+              <Text style={styles.statsValue}>{profile.gender}</Text>
+            </View>
+          </View>
+          <View style={styles.statItem}>
+            <Ionicons name="star" size={20} color={COLORS.textSecondary} />
+            <View style={styles.statContent}>
+              <Text style={styles.statsLabel}>Points</Text>
+              <Text style={styles.statsValue}>{profile.points}</Text>
+            </View>
+          </View>
+          <View style={styles.statItem}>
+            <Ionicons name="musical-notes" size={20} color={COLORS.textSecondary} />
+            <View style={styles.statContent}>
+              <Text style={styles.statsLabel}>Music Tastes</Text>
+              <View style={styles.musicTags}>
+                {profile.musicTastes.map((taste, index) => (
+                  <View key={index} style={styles.musicTag}>
+                    <Text style={styles.musicTagText}>{taste}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
         </View>
-        <View style={styles.statsRow}>
-          <Text style={styles.statsLabel}>Music Tastes</Text>
-          <Text style={styles.statsValue}>{profile.musicTastes.join(', ')}</Text>
-        </View>
+        <AppButton title="Logout" onPress={handleLogout} variant="secondary" style={styles.logoutButton} />
       </Card>
       
-      <Card>
-        <Text style={styles.cardTitle}>Earn Points</Text>
+      <Card variant="premium">
+        <View style={styles.cardHeader}>
+          <Ionicons name="trophy" size={24} color={COLORS.textSecondary} />
+          <Text style={styles.cardTitle}>Earn Points</Text>
+        </View>
         
         <View style={styles.gameItem}>
-          <View style={styles.gameHeader}>
-            <Ionicons name="shirt-outline" size={24} color={COLORS.accent} />
-            <Text style={styles.gameTitle}>Best Dressing</Text>
-          </View>
-          <Text style={styles.gameDescription}>
-            Win the best dressed contest and earn 500 points!
-          </Text>
-          <Text style={styles.gameHint}>
-            Participate by posting a photo or video with the hashtag #best_dressing_game
-          </Text>
-          <TouchableOpacity
-            style={styles.pointsBadge}
-            onPress={handleParticipateBestDressing}
-            activeOpacity={0.7}
+          <LinearGradient
+            colors={[COLORS.surfaceHighlight, COLORS.surface]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gameCard}
           >
-            <Text style={styles.pointsText}>+500 pts</Text>
-          </TouchableOpacity>
+            <View style={styles.gameHeader}>
+              <View style={styles.gameIconContainer}>
+                <Ionicons name="shirt" size={28} color={COLORS.textSecondary} />
+              </View>
+              <View style={styles.gameInfo}>
+                <Text style={styles.gameTitle}>Best Dressing</Text>
+                <Text style={styles.gameDescription}>
+                  Win the best dressed contest and earn 500 points!
+                </Text>
+                <Text style={styles.gameHint}>
+                  Post a photo or video with #best_dressing_game
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.pointsBadge}
+              onPress={handleParticipateBestDressing}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="add-circle" size={20} color={COLORS.primaryBackground} />
+              <Text style={styles.pointsText}>+500 pts</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
 
         <View style={styles.gameItem}>
-          <View style={styles.gameHeader}>
-            <Ionicons name="musical-notes-outline" size={24} color={COLORS.accent} />
-            <Text style={styles.gameTitle}>Best Dance</Text>
-          </View>
-          <Text style={styles.gameDescription}>
-            Show your moves and win the dance competition for 750 points!
-          </Text>
-          <Text style={styles.gameHint}>
-            Participate by posting a video with the hashtag #best_dance_game
-          </Text>
-          <TouchableOpacity
-            style={styles.pointsBadge}
-            onPress={handleParticipateBestDance}
-            activeOpacity={0.7}
+          <LinearGradient
+            colors={[COLORS.surfaceHighlight, COLORS.surface]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gameCard}
           >
-            <Text style={styles.pointsText}>+750 pts</Text>
-          </TouchableOpacity>
+            <View style={styles.gameHeader}>
+              <View style={styles.gameIconContainer}>
+                <Ionicons name="musical-notes" size={28} color={COLORS.textSecondary} />
+              </View>
+              <View style={styles.gameInfo}>
+                <Text style={styles.gameTitle}>Best Dance</Text>
+                <Text style={styles.gameDescription}>
+                  Show your moves and win 750 points!
+                </Text>
+                <Text style={styles.gameHint}>
+                  Post a video with #best_dance_game
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={[styles.pointsBadge, styles.pointsBadgeBrand]}
+              onPress={handleParticipateBestDance}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="add-circle" size={20} color={COLORS.textPrimary} />
+              <Text style={[styles.pointsText, styles.pointsTextBrand]}>+750 pts</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
 
         <View style={styles.gameItem}>
-          <View style={styles.gameHeader}>
-            <Ionicons name="people-outline" size={24} color={COLORS.accent} />
-            <Text style={styles.gameTitle}>Invite Friends</Text>
-          </View>
-          <Text style={styles.gameDescription}>
-            Invite your friends to join the club. Earn 200 points per friend!
-          </Text>
-          <TouchableOpacity
-            style={styles.pointsBadge}
-            onPress={() => setShowReferralCode(true)}
-            activeOpacity={0.7}
+          <LinearGradient
+            colors={[COLORS.surfaceHighlight, COLORS.surface]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gameCard}
           >
-            <Text style={styles.pointsText}>+200 pts/friend</Text>
-          </TouchableOpacity>
+            <View style={styles.gameHeader}>
+              <View style={styles.gameIconContainer}>
+                <Ionicons name="people" size={28} color={COLORS.textSecondary} />
+              </View>
+              <View style={styles.gameInfo}>
+                <Text style={styles.gameTitle}>Invite Friends</Text>
+                <Text style={styles.gameDescription}>
+                  Invite friends and earn 200 points per friend!
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.pointsBadge}
+              onPress={() => setShowReferralCode(true)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="gift" size={20} color={COLORS.primaryBackground} />
+              <Text style={styles.pointsText}>+200 pts/friend</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
       </Card>
 
@@ -220,14 +311,14 @@ export default function ProfileScreen() {
                 style={styles.referralActionButton}
                 onPress={handleCopyReferralCode}
               >
-                <Ionicons name="copy-outline" size={24} color={COLORS.accent} />
+                <Ionicons name="copy-outline" size={24} color={COLORS.textSecondary} />
                 <Text style={styles.referralActionText}>Copy</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.referralActionButton}
                 onPress={handleShareReferralCode}
               >
-                <Ionicons name="share-outline" size={24} color={COLORS.accent} />
+                <Ionicons name="share-outline" size={24} color={COLORS.textSecondary} />
                 <Text style={styles.referralActionText}>Share</Text>
               </TouchableOpacity>
             </View>
@@ -240,108 +331,249 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerGradient: {
+    borderRadius: 5,
+    marginBottom: SIZES.base * 2,
+    padding: SIZES.base * 2,
+    ...SIZES.shadow.md,
+  },
   header: {
     alignItems: 'center',
-    marginBottom: SIZES.padding,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: SIZES.base,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: SIZES.base * 2,
+    width: 80,
+    height: 80,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: COLORS.textSecondary,
+    ...SIZES.shadow.sm,
+  },
+  avatarBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.primaryBackground,
+    ...SIZES.shadow.sm,
   },
   name: {
     ...FONTS.h2,
     color: COLORS.textPrimary,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: SIZES.base / 2,
   },
   email: {
-    ...FONTS.body4,
-    color: COLORS.textSecondary,
+    ...FONTS.body3,
+    color: COLORS.textTertiary,
     marginBottom: SIZES.base * 2,
   },
+  pointsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SIZES.base * 2,
+    paddingVertical: SIZES.base,
+    borderRadius: 5,
+    gap: SIZES.base,
+    ...SIZES.shadow.sm,
+  },
+  pointsText: {
+    ...FONTS.body2,
+    color: COLORS.textSecondary,
+    fontWeight: '700',
+  },
   membershipCard: {
-    backgroundColor: COLORS.surfaceHighlight,
-    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+    marginBottom: SIZES.padding,
+  },
+  membershipGradient: {
     padding: SIZES.padding,
   },
   membershipHeader: {
+    marginBottom: SIZES.base * 2,
+  },
+  membershipTitleContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SIZES.base,
+    gap: SIZES.base,
   },
   membershipTitle: {
     ...FONTS.h4,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   membership: {
-    ...FONTS.h1,
-    fontWeight: 'bold',
+    ...FONTS.h2,
+    fontWeight: '800',
+    marginTop: SIZES.base / 2,
+    letterSpacing: 1,
+  },
+  membershipBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
     marginTop: SIZES.base,
+    paddingHorizontal: SIZES.base,
+    paddingVertical: SIZES.base / 2,
+    borderRadius: 5,
+    gap: SIZES.base / 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  membershipBadgeText: {
+    ...FONTS.body4,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.base * 2,
+    gap: SIZES.base,
   },
   cardTitle: {
-    ...FONTS.h4,
+    ...FONTS.h3,
     color: COLORS.textPrimary,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  statsContainer: {
+    gap: SIZES.base,
     marginBottom: SIZES.base * 2,
   },
-  statsRow: {
+  statItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: SIZES.base,
     paddingVertical: SIZES.base,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.surfaceHighlight,
+  },
+  statContent: {
+    flex: 1,
   },
   statsLabel: {
-    ...FONTS.body3,
-    color: COLORS.textSecondary,
+    ...FONTS.body4,
+    color: COLORS.textTertiary,
+    marginBottom: SIZES.base / 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   statsValue: {
-    ...FONTS.body3,
+    ...FONTS.body2,
     color: COLORS.textPrimary,
+    fontWeight: '700',
+  },
+  musicTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SIZES.base,
+    marginTop: SIZES.base / 2,
+  },
+  musicTag: {
+    backgroundColor: COLORS.glass,
+    paddingHorizontal: SIZES.base * 1.5,
+    paddingVertical: SIZES.base / 2,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+  },
+  musicTagText: {
+    ...FONTS.body4,
+    color: COLORS.textSecondary,
     fontWeight: '600',
   },
+  logoutButton: {
+    marginTop: SIZES.base,
+  },
   gameItem: {
-    marginBottom: SIZES.padding,
-    paddingBottom: SIZES.padding,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.surface,
+    marginBottom: SIZES.base * 2,
+  },
+  gameCard: {
+    borderRadius: 5,
+    padding: SIZES.base * 2,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+    backgroundColor: COLORS.glass,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 20,
+    elevation: 6,
   },
   gameHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: SIZES.base,
+  },
+  gameIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 5,
+    backgroundColor: COLORS.glass,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.base,
+    ...SIZES.shadow.sm,
+  },
+  gameInfo: {
+    flex: 1,
   },
   gameTitle: {
     ...FONTS.h4,
     color: COLORS.textPrimary,
-    fontWeight: 'bold',
-    marginLeft: SIZES.base,
+    fontWeight: '800',
+    marginBottom: SIZES.base / 2,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   gameDescription: {
-    ...FONTS.body4,
+    ...FONTS.body3,
     color: COLORS.textSecondary,
-    marginBottom: SIZES.base,
+    marginBottom: SIZES.base / 2,
+    lineHeight: 20,
   },
   gameHint: {
     ...FONTS.body4,
-    color: COLORS.textSecondary,
+    color: COLORS.textTertiary,
     fontStyle: 'italic',
-    marginBottom: SIZES.base,
     fontSize: 12,
   },
   pointsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.accent,
-    paddingHorizontal: SIZES.base * 1.5,
-    paddingVertical: SIZES.base / 2,
-    borderRadius: SIZES.radius,
-    marginBottom: SIZES.base,
-    cursor: 'pointer',
+    backgroundColor: COLORS.textSecondary,
+    paddingHorizontal: SIZES.base * 2,
+    paddingVertical: SIZES.base * 1.5,
+    borderRadius: 5,
+    gap: SIZES.base / 2,
+    ...SIZES.shadow.md,
+  },
+  pointsBadgePremium: {
+    backgroundColor: COLORS.brand,
+  },
+  pointsBadgeBrand: {
+    backgroundColor: COLORS.textSecondary,
+  },
+  pointsTextBrand: {
+    color: COLORS.textPrimary,
   },
   pointsText: {
-    ...FONTS.body4,
+    ...FONTS.body3,
     color: COLORS.primaryBackground,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   modalOverlay: {
     flex: 1,
@@ -350,12 +582,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   referralModalContent: {
-    backgroundColor: COLORS.primaryBackground,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.padding,
     width: '90%',
     maxWidth: 400,
     zIndex: 1,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   referralModalHeader: {
     flexDirection: 'row',
@@ -375,17 +609,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   referralCodeBox: {
-    backgroundColor: COLORS.surface,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+    borderRadius: 5,
     padding: SIZES.base * 2,
     marginBottom: SIZES.padding,
     alignItems: 'center',
   },
   referralCode: {
     ...FONTS.h2,
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: 'bold',
     letterSpacing: 3,
   },
@@ -398,14 +632,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.surfaceHighlight,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.base * 1.5,
     gap: SIZES.base / 2,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   referralActionText: {
     ...FONTS.body3,
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: '600',
   },
 });

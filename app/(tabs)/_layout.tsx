@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/constants/theme';
+import { StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, SIZES, FONTS } from '@/constants/theme';
 import { useAuthStore } from '@/store/authStore';
 
 type TabConfig = {
@@ -83,15 +85,41 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: COLORS.accent,
-        tabBarInactiveTintColor: COLORS.textDisabled,
+        tabBarActiveTintColor: COLORS.textPrimary,
+        tabBarInactiveTintColor: COLORS.textTertiary,
         tabBarStyle: {
-          backgroundColor: COLORS.neutral,
-          borderTopColor: COLORS.surface,
+          backgroundColor: COLORS.surface,
+          borderTopWidth: 0,
+          height: 70,
+          paddingBottom: SIZES.base * 2,
+          paddingTop: SIZES.base,
+          ...SIZES.shadow.lg,
+          elevation: 20,
+        },
+        tabBarLabelStyle: {
+          ...FONTS.caption,
+          fontWeight: '600',
+          letterSpacing: 0.5,
         },
         tabBarIcon: ({ color, size, focused }) => {
           const icon = allIconMap[route.name];
           const iconName = focused ? icon?.active : icon?.inactive;
+          if (focused && iconName) {
+            return (
+              <LinearGradient
+                colors={COLORS.goldGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.tabIcon}
+              >
+                <Ionicons
+                  name={iconName}
+                  size={size - 6}
+                  color="#000000"
+                />
+              </LinearGradient>
+            );
+          }
           return (
             <Ionicons
               name={(iconName ?? 'ellipse-outline') as keyof typeof Ionicons.glyphMap}
@@ -166,3 +194,17 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabIcon: {
+    padding: SIZES.base / 1.5,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.goldGlow,
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 6,
+  },
+});

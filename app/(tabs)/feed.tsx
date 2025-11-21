@@ -11,8 +11,11 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MOCK_FEED_CONTENT, MOCK_USERS, FeedContent, User } from '@/api/mockData';
+import AppButton from '@/components/AppButton';
+import Screen from '@/components/Screen';
 import { COLORS, FONTS, SIZES } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/store/authStore';
@@ -94,6 +97,12 @@ export default function FeedScreen() {
         {/* Media (image ou vidéo) */}
         <View style={styles.mediaContainer}>
           <Image source={{ uri: item.mediaUrl }} style={styles.media} />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.85)']}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.mediaOverlay}
+          />
           {item.type === 'video' && (
             <View style={styles.videoIndicator}>
               <Ionicons name="play-circle" size={40} color={COLORS.textPrimary} />
@@ -179,14 +188,35 @@ export default function FeedScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Feed</Text>
-        <TouchableOpacity onPress={() => setShowAddContent(true)}>
-          <Ionicons name="add-circle" size={32} color={COLORS.accent} />
-        </TouchableOpacity>
-      </View>
+    <Screen>
+      <View style={styles.container}>
+      {/* Header Premium */}
+      <LinearGradient
+        colors={[COLORS.surface, COLORS.primaryBackground]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Ionicons name="sparkles" size={28} color={COLORS.textSecondary} />
+            <Text style={styles.headerTitle}>Feed</Text>
+          </View>
+          <TouchableOpacity 
+            onPress={() => setShowAddContent(true)}
+            style={styles.addButton}
+          >
+            <LinearGradient
+              colors={[COLORS.textSecondary, COLORS.textTertiary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.addButtonGradient}
+            >
+              <Ionicons name="add" size={24} color={COLORS.primaryBackground} />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
       {/* Feed vertical style TikTok */}
       <FlatList
@@ -233,7 +263,7 @@ export default function FeedScreen() {
                 <Ionicons
                   name="image-outline"
                   size={24}
-                  color={contentType === 'image' ? COLORS.accent : COLORS.textSecondary}
+                  color={contentType === 'image' ? COLORS.textSecondary : COLORS.textTertiary}
                 />
                 <Text
                   style={[
@@ -254,7 +284,7 @@ export default function FeedScreen() {
                 <Ionicons
                   name="videocam-outline"
                   size={24}
-                  color={contentType === 'video' ? COLORS.accent : COLORS.textSecondary}
+                  color={contentType === 'video' ? COLORS.textSecondary : COLORS.textTertiary}
                 />
                 <Text
                   style={[
@@ -281,7 +311,7 @@ export default function FeedScreen() {
                   <Ionicons
                     name="globe-outline"
                     size={20}
-                    color={visibility === 'public' ? COLORS.accent : COLORS.textSecondary}
+                    color={visibility === 'public' ? COLORS.textSecondary : COLORS.textTertiary}
                   />
                   <Text
                     style={[
@@ -302,7 +332,7 @@ export default function FeedScreen() {
                   <Ionicons
                     name="lock-closed-outline"
                     size={20}
-                    color={visibility === 'private' ? COLORS.accent : COLORS.textSecondary}
+                    color={visibility === 'private' ? COLORS.textSecondary : COLORS.textTertiary}
                   />
                   <Text
                     style={[
@@ -337,45 +367,65 @@ export default function FeedScreen() {
               <Ionicons
                 name={contentType === 'image' ? 'image-outline' : 'videocam-outline'}
                 size={24}
-                color={COLORS.accent}
+                color={COLORS.textSecondary}
               />
               <Text style={styles.addMediaText}>Add {contentType === 'image' ? 'Photo' : 'Video'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.modalButton, !newCaption.trim() && styles.modalButtonDisabled]}
+            <AppButton
+              title="Post"
               onPress={handleAddContent}
               disabled={!newCaption.trim()}
-            >
-              <Text style={styles.modalButtonText}>Post</Text>
-            </TouchableOpacity>
+              style={styles.modalButtonWrapper}
+            />
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.primaryBackground,
+    backgroundColor: 'transparent',
+  },
+  headerGradient: {
+    paddingTop: SIZES.padding,
+    paddingBottom: SIZES.base,
+    paddingHorizontal: SIZES.padding,
+    zIndex: 10,
+    ...SIZES.shadow.md,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SIZES.padding,
-    paddingVertical: SIZES.base * 2,
-    paddingTop: SIZES.padding * 2,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.surface,
-    zIndex: 10,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.base,
   },
   headerTitle: {
-    ...FONTS.h1,
+    ...FONTS.h2,
     color: COLORS.textPrimary,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  addButton: {
+    borderRadius: 5,
+    overflow: 'hidden',
+    ...SIZES.shadow.md,
+  },
+  addButtonGradient: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
   },
   feedItem: {
     width: SCREEN_WIDTH,
@@ -392,13 +442,17 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: COLORS.surface,
   },
+  mediaOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 5,
+  },
   videoIndicator: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: [{ translateX: -20 }, { translateY: -20 }],
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 20,
+    borderRadius: 5,
     padding: 10,
   },
   privateBadge: {
@@ -407,10 +461,13 @@ const styles = StyleSheet.create({
     right: SIZES.base * 2,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: SIZES.base,
-    paddingVertical: SIZES.base / 2,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    paddingHorizontal: SIZES.base * 1.5,
+    paddingVertical: SIZES.base,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+    ...SIZES.shadow.md,
   },
   privateText: {
     ...FONTS.body4,
@@ -423,11 +480,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: SIZES.base * 2,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: SIZES.base * 3,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
+    borderTopLeftRadius: SIZES.radiusLarge,
+    borderTopRightRadius: SIZES.radiusLarge,
   },
   bottomInfoLeft: {
     flex: 1,
@@ -439,17 +498,19 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.base,
   },
   userAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 5,
     marginRight: SIZES.base,
     borderWidth: 2,
-    borderColor: COLORS.accent,
+    borderColor: COLORS.goldGradient[0],
+    ...SIZES.shadow.sm,
   },
   userName: {
-    ...FONTS.body3,
+    ...FONTS.body2,
     color: COLORS.textPrimary,
-    fontWeight: '600',
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
   caption: {
     ...FONTS.body3,
@@ -466,13 +527,18 @@ const styles = StyleSheet.create({
   },
   bottomActionButton: {
     alignItems: 'center',
-    marginBottom: SIZES.base * 1.5,
+    marginBottom: SIZES.base * 2,
+    padding: SIZES.base,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    minWidth: 60,
   },
   bottomActionCount: {
     ...FONTS.body4,
     color: COLORS.textPrimary,
     marginTop: SIZES.base / 2,
     fontSize: 12,
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,
@@ -481,12 +547,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: COLORS.primaryBackground,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.padding,
     width: '90%',
     maxWidth: 400,
     zIndex: 1,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -509,15 +577,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.base * 1.5,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'transparent',
   },
   typeButtonActive: {
-    borderColor: COLORS.accent,
-    backgroundColor: COLORS.surfaceHighlight,
+    borderColor: COLORS.goldGradient[0],
+    backgroundColor: COLORS.glass,
   },
   typeButtonText: {
     ...FONTS.body3,
@@ -525,7 +593,7 @@ const styles = StyleSheet.create({
     marginLeft: SIZES.base / 2,
   },
   typeButtonTextActive: {
-    color: COLORS.accent,
+    color: COLORS.textPrimary,
     fontWeight: '600',
   },
   visibilitySection: {
@@ -547,15 +615,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.base * 1.5,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'transparent',
   },
   visibilityButtonActive: {
-    borderColor: COLORS.accent,
-    backgroundColor: COLORS.surfaceHighlight,
+    borderColor: COLORS.goldGradient[0],
+    backgroundColor: COLORS.glass,
   },
   visibilityButtonText: {
     ...FONTS.body4,
@@ -563,7 +631,7 @@ const styles = StyleSheet.create({
     marginLeft: SIZES.base / 2,
   },
   visibilityButtonTextActive: {
-    color: COLORS.accent,
+    color: COLORS.textPrimary,
     fontWeight: '600',
   },
   visibilityHint: {
@@ -575,8 +643,8 @@ const styles = StyleSheet.create({
   captionInput: {
     ...FONTS.body3,
     color: COLORS.textPrimary,
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.base * 1.5,
     minHeight: 100,
     marginBottom: SIZES.base * 2,
@@ -586,29 +654,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
     padding: SIZES.base * 1.5,
     marginBottom: SIZES.base * 2,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   addMediaText: {
     ...FONTS.body3,
-    color: COLORS.accent,
+    color: COLORS.textPrimary,
     marginLeft: SIZES.base,
     fontWeight: '600',
   },
-  modalButton: {
-    backgroundColor: COLORS.accent,
-    borderRadius: SIZES.radius,
-    padding: SIZES.base * 1.5,
-    alignItems: 'center',
-  },
-  modalButtonDisabled: {
-    backgroundColor: COLORS.textDisabled,
-  },
-  modalButtonText: {
-    ...FONTS.body3,
-    color: COLORS.primaryBackground,
-    fontWeight: 'bold',
+  modalButtonWrapper: {
+    marginTop: SIZES.base,
   },
 });

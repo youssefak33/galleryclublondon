@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Modal, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Screen from '@/components/Screen';
 import Card from '@/components/Card';
@@ -137,8 +138,19 @@ export default function EventsScreen() {
 
   // Rendu pour les membres
   const renderMemberEvent = ({ item }: { item: Event }) => (
-    <Card style={styles.eventCard}>
+    <Card variant="premium" style={styles.eventCard}>
+      <LinearGradient
+        colors={[COLORS.surfaceHighlight, COLORS.surface]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.eventGradient}
+      >
+        <View style={styles.eventHeader}>
+          <Ionicons name="sparkles" size={28} color={COLORS.textSecondary} />
       <Text style={styles.eventTitle}>{item.title}</Text>
+        </View>
+        <View style={styles.eventDateContainer}>
+          <Ionicons name="calendar" size={20} color={COLORS.textTertiary} />
       <Text style={styles.eventDate}>
         {new Date(item.date).toLocaleDateString('en-US', {
           weekday: 'long',
@@ -147,22 +159,29 @@ export default function EventsScreen() {
           day: 'numeric',
         })}
       </Text>
+        </View>
       <Text style={styles.eventDescription}>{item.description}</Text>
+        <View style={styles.guestsContainer}>
+          <Ionicons name="people" size={18} color={COLORS.textSecondary} />
       <Text style={styles.eventGuests}>
         Special Guests: {item.specialGuests.join(', ')}
       </Text>
+        </View>
       <View style={styles.buttonContainer}>
-        <AppButton 
-          title="Book Ticket" 
-          onPress={() => handleBookEvent(item, 'ticket')} 
-        />
-        <View style={{width: SIZES.base}}/>
-        <AppButton 
-          title="Book VIP Table" 
-          onPress={() => handleBookEvent(item, 'vip')} 
-          variant="secondary" 
-        />
+          <AppButton 
+            title="Book Ticket" 
+            onPress={() => handleBookEvent(item, 'ticket')}
+            variant="primary"
+            style={styles.eventButton}
+          />
+          <AppButton 
+            title="Book VIP Table" 
+            onPress={() => handleBookEvent(item, 'vip')} 
+            variant="secondary"
+            style={styles.eventButton}
+          />
       </View>
+      </LinearGradient>
     </Card>
   );
 
@@ -173,30 +192,55 @@ export default function EventsScreen() {
     const vipCount = bookings.filter(b => b.bookingType === 'vip').length;
 
     return (
-      <Card style={styles.eventCard}>
-        <Text style={styles.eventTitle}>{item.title}</Text>
-        <Text style={styles.eventDate}>
-          {new Date(item.date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
-        <Text style={styles.eventDescription}>{item.description}</Text>
-        <Text style={styles.eventGuests}>
-          Special Guests: {item.specialGuests.join(', ')}
-        </Text>
-        <View style={styles.statsContainer}>
-          <Text style={styles.statsText}>
-            Tickets: {ticketCount} | VIP: {vipCount} | Total: {bookings.length}
-          </Text>
-        </View>
-        <AppButton 
-          title="Check Guests" 
-          onPress={() => handleCheckGuests(item)}
-          variant="secondary"
-        />
+      <Card variant="premium" style={styles.eventCard}>
+        <LinearGradient
+          colors={[COLORS.surfaceHighlight, COLORS.surface]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.eventGradient}
+        >
+          <View style={styles.eventHeader}>
+            <Ionicons name="calendar" size={28} color={COLORS.textSecondary} />
+            <Text style={styles.eventTitle}>{item.title}</Text>
+          </View>
+          <View style={styles.eventDateContainer}>
+            <Ionicons name="time" size={20} color={COLORS.textTertiary} />
+            <Text style={styles.eventDate}>
+              {new Date(item.date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+          <Text style={styles.eventDescription}>{item.description}</Text>
+          <View style={styles.guestsContainer}>
+            <Ionicons name="people" size={18} color={COLORS.textSecondary} />
+            <Text style={styles.eventGuests}>
+              Special Guests: {item.specialGuests.join(', ')}
+            </Text>
+          </View>
+          <View style={styles.statsContainer}>
+            <View style={styles.statBadge}>
+              <Ionicons name="ticket" size={16} color={COLORS.textSecondary} />
+              <Text style={styles.statText}>{ticketCount} Tickets</Text>
+            </View>
+            <View style={styles.statBadge}>
+              <Ionicons name="diamond" size={16} color={COLORS.textSecondary} />
+              <Text style={styles.statText}>{vipCount} VIP</Text>
+            </View>
+            <View style={styles.statBadge}>
+              <Ionicons name="people" size={16} color={COLORS.textSecondary} />
+              <Text style={styles.statText}>{bookings.length} Total</Text>
+            </View>
+          </View>
+          <AppButton 
+            title="Check Guests" 
+            onPress={() => handleCheckGuests(item)}
+            variant="secondary"
+          />
+        </LinearGradient>
       </Card>
     );
   };
@@ -209,42 +253,74 @@ export default function EventsScreen() {
       date: dateString,
     };
     return (
-      <Card style={styles.eventCard}>
-        <Text style={styles.eventTitle}>Regular Night</Text>
-        <Text style={styles.eventDate}>
-          {date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
-        <Text style={styles.eventDescription}>
-          Join us for a regular night at Gallery Club London. Great music, great vibes!
-        </Text>
-        {!isStaff && (
-          <View style={styles.buttonContainer}>
-            <AppButton 
-              title="Buy Ticket" 
-              onPress={() => handleBookEvent(regularEvent, 'ticket')} 
-            />
-            <View style={{width: SIZES.base}}/>
-            <AppButton 
-              title="Book VIP Table" 
-              onPress={() => handleBookEvent(regularEvent, 'vip')} 
-              variant="secondary" 
-            />
+      <Card variant="premium" style={styles.eventCard}>
+        <LinearGradient
+          colors={[COLORS.surfaceHighlight, COLORS.surface]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.eventGradient}
+        >
+          <View style={styles.eventHeader}>
+            <Ionicons name="musical-notes" size={28} color={COLORS.textSecondary} />
+            <Text style={styles.eventTitle}>Regular Night</Text>
           </View>
-        )}
+          <View style={styles.eventDateContainer}>
+            <Ionicons name="calendar" size={20} color={COLORS.textTertiary} />
+            <Text style={styles.eventDate}>
+              {date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </Text>
+          </View>
+          <Text style={styles.eventDescription}>
+            Join us for a regular night at Gallery Club London. Great music, great vibes!
+          </Text>
+          {!isStaff && (
+            <View style={styles.buttonContainer}>
+              <AppButton 
+                title="Buy Ticket" 
+                onPress={() => handleBookEvent(regularEvent, 'ticket')}
+                variant="primary"
+                style={styles.eventButton}
+              />
+              <AppButton 
+                title="Book VIP Table" 
+                onPress={() => handleBookEvent(regularEvent, 'vip')} 
+                variant="secondary"
+                style={styles.eventButton}
+              />
+            </View>
+          )}
+        </LinearGradient>
       </Card>
     );
   };
 
   return (
     <Screen scrollable>
-      <Text style={styles.title}>
-        {isStaff ? 'Event Management' : 'Upcoming Events'}
-      </Text>
+      {/* Header Premium */}
+      <View style={styles.header}>
+        <LinearGradient
+          colors={[COLORS.surface, COLORS.primaryBackground]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerGradient}
+        >
+          <View style={styles.headerContent}>
+            <Ionicons 
+              name={isStaff ? 'calendar' : 'sparkles'} 
+              size={32} 
+              color={COLORS.textSecondary} 
+            />
+            <Text style={styles.title}>
+              {isStaff ? 'Event Management' : 'Upcoming Events'}
+            </Text>
+          </View>
+        </LinearGradient>
+      </View>
 
       {/* Calendrier personnalisé */}
       <Card style={styles.calendarCard}>
@@ -481,7 +557,7 @@ export default function EventsScreen() {
                 <Ionicons
                   name="card-outline"
                   size={32}
-                  color={selectedPaymentMethod === 'card' ? COLORS.accent : COLORS.textSecondary}
+                  color={selectedPaymentMethod === 'card' ? COLORS.textSecondary : COLORS.textTertiary}
                 />
                 <Text
                   style={[
@@ -503,7 +579,7 @@ export default function EventsScreen() {
                 <Ionicons
                   name="logo-apple"
                   size={32}
-                  color={selectedPaymentMethod === 'apple' ? COLORS.accent : COLORS.textSecondary}
+                  color={selectedPaymentMethod === 'apple' ? COLORS.textSecondary : COLORS.textTertiary}
                 />
                 <Text
                   style={[
@@ -525,7 +601,7 @@ export default function EventsScreen() {
                 <Ionicons
                   name="logo-google"
                   size={32}
-                  color={selectedPaymentMethod === 'google' ? COLORS.accent : COLORS.textSecondary}
+                  color={selectedPaymentMethod === 'google' ? COLORS.textSecondary : COLORS.textTertiary}
                 />
                 <Text
                   style={[
@@ -571,25 +647,50 @@ export default function EventsScreen() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    marginBottom: SIZES.base * 2,
+  },
+  headerGradient: {
+    borderRadius: 5,
+    padding: SIZES.base * 2,
+    ...SIZES.shadow.md,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.base,
+  },
   title: {
-    ...FONTS.h1,
+    ...FONTS.h2,
     color: COLORS.textPrimary,
-    fontWeight: 'bold',
-    marginBottom: SIZES.padding,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   sectionTitle: {
-    ...FONTS.h3,
-    color: COLORS.textPrimary,
-    fontWeight: 'bold',
+    ...FONTS.h4,
+    color: COLORS.textSecondary,
+    fontWeight: '700',
     marginTop: SIZES.padding,
     marginBottom: SIZES.base,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   upcomingEventsList: {
     marginBottom: SIZES.padding,
   },
   calendarCard: {
     marginBottom: SIZES.padding,
-    padding: SIZES.base * 2,
+    padding: SIZES.base * 3,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 12 },
+    shadowRadius: 20,
+    elevation: 8,
   },
   calendarHeader: {
     flexDirection: 'row',
@@ -604,6 +705,8 @@ const styles = StyleSheet.create({
     ...FONTS.h3,
     color: COLORS.textPrimary,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   weekDaysRow: {
     flexDirection: 'row',
@@ -618,6 +721,7 @@ const styles = StyleSheet.create({
     ...FONTS.body4,
     color: COLORS.textSecondary,
     fontWeight: '600',
+    textTransform: 'uppercase',
   },
   weekDatesRow: {
     flexDirection: 'row',
@@ -629,14 +733,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: SIZES.base,
-    borderRadius: SIZES.radius,
+    borderRadius: 5,
     position: 'relative',
   },
   todayCell: {
     backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   selectedCell: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.textSecondary,
+    borderWidth: 1,
+    borderColor: COLORS.goldGradient[0],
   },
   dateNumber: {
     ...FONTS.body3,
@@ -644,7 +752,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   todayText: {
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: 'bold',
   },
   selectedText: {
@@ -656,8 +764,8 @@ const styles = StyleSheet.create({
     bottom: 4,
     width: 6,
     height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.accent,
+    borderRadius: 5,
+    backgroundColor: COLORS.textSecondary,
   },
   selectedDot: {
     backgroundColor: COLORS.primaryBackground,
@@ -667,41 +775,94 @@ const styles = StyleSheet.create({
   },
   eventCard: {
     marginBottom: SIZES.padding,
+    overflow: 'hidden',
+  },
+  eventGradient: {
+    padding: SIZES.base * 2,
+    borderRadius: 5,
+  },
+  eventHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.base,
+    gap: SIZES.base,
   },
   eventTitle: {
     ...FONTS.h3,
-    color: COLORS.accent,
-    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    flex: 1,
+  },
+  eventDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.base,
+    gap: SIZES.base / 2,
   },
   eventDate: {
-    ...FONTS.body4,
+    ...FONTS.body3,
     color: COLORS.textSecondary,
-    marginVertical: SIZES.base / 2,
+    fontWeight: '600',
   },
   eventDescription: {
     ...FONTS.body4,
-    color: COLORS.textPrimary,
-    marginVertical: SIZES.base,
+    color: COLORS.textSecondary,
+    marginBottom: SIZES.base,
+    lineHeight: 18,
+  },
+  guestsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.base,
+    gap: SIZES.base / 2,
+    padding: SIZES.base,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   eventGuests: {
-    ...FONTS.body4,
-    color: COLORS.textSecondary,
-    fontStyle: 'italic',
-    marginBottom: SIZES.base * 2,
+    ...FONTS.body3,
+    color: COLORS.textPrimary,
+    fontWeight: '600',
+    flex: 1,
   },
   buttonContainer: {
     flexDirection: 'row',
+    marginTop: SIZES.base,
+    gap: SIZES.base,
+  },
+  eventButton: {
+    flex: 1,
+    minHeight: 40,
+    paddingVertical: SIZES.base,
+  },
+  eventButtonText: {
+    ...FONTS.body4,
+    fontWeight: '600',
   },
   statsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SIZES.base / 2,
     marginVertical: SIZES.base,
-    padding: SIZES.base,
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radius,
   },
-  statsText: {
+  statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.glass,
+    paddingHorizontal: SIZES.base * 2,
+    paddingVertical: SIZES.base,
+    borderRadius: 5,
+    gap: SIZES.base / 2,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+  },
+  statText: {
     ...FONTS.body4,
     color: COLORS.textPrimary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,
@@ -709,11 +870,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: COLORS.primaryBackground,
-    borderTopLeftRadius: SIZES.radius * 2,
-    borderTopRightRadius: SIZES.radius * 2,
+    backgroundColor: COLORS.glass,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     maxHeight: '80%',
     padding: SIZES.padding,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: -12 },
+    shadowRadius: 24,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -746,7 +913,7 @@ const styles = StyleSheet.create({
   },
   guestName: {
     ...FONTS.h4,
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: 'bold',
     marginBottom: SIZES.base / 2,
   },
@@ -762,7 +929,7 @@ const styles = StyleSheet.create({
   },
   guestBookingType: {
     ...FONTS.body4,
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: '600',
     marginBottom: SIZES.base / 2,
   },
@@ -796,7 +963,7 @@ const styles = StyleSheet.create({
   },
   paymentAmount: {
     ...FONTS.h2,
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: 'bold',
     marginTop: SIZES.base,
   },
@@ -814,14 +981,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: SIZES.base * 2,
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radius,
-    borderWidth: 2,
+    backgroundColor: COLORS.glass,
+    borderRadius: 5,
+    borderWidth: 1,
     borderColor: 'transparent',
   },
   paymentMethodSelected: {
-    borderColor: COLORS.accent,
-    backgroundColor: COLORS.surface,
+    borderColor: COLORS.goldGradient[0],
+    backgroundColor: COLORS.glass,
   },
   paymentMethodText: {
     ...FONTS.body2,
@@ -830,7 +997,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   paymentMethodTextSelected: {
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontWeight: '600',
   },
   payButton: {

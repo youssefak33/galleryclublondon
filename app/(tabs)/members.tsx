@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: 'bold',
     marginBottom: SIZES.padding,
+    textTransform: 'uppercase',
   },
   memberCard: {
     padding: SIZES.base * 1.5,
@@ -44,8 +45,10 @@ const styles = StyleSheet.create({
   },
   memberName: {
     ...FONTS.h4,
-    color: COLORS.accent,
+    color: COLORS.textPrimary,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   memberInfo: {
     ...FONTS.body4,

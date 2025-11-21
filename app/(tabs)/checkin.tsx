@@ -51,6 +51,8 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: 'bold',
     textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   },
   subtitle: {
     ...FONTS.body4,
@@ -64,17 +66,21 @@ const styles = StyleSheet.create({
   },
   qrCodeContainer: {
     padding: SIZES.base * 2,
-    backgroundColor: COLORS.surface, // Same as QR background for seamless look
-    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.glass, // Same as QR background for seamless look
+    borderRadius: 5,
     marginBottom: SIZES.padding,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   profileName: {
     ...FONTS.h3,
     color: COLORS.textPrimary,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   profileMembership: {
     ...FONTS.body3,
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
   },
 });
